@@ -35,12 +35,22 @@ def ssh_config_entry(user, hostname, local_key_path, ssh_user=None, host_ip=None
     comment = '# Auto-generated entry for {hostname} of {ssh_user}'.format(hostname=hostname, ssh_user=_ssh_user)
     match_and_delete_n_lines(remote_config_path, comment, 6)
 
-    put(local_key_path, remote_key_path)
+    if not fabric.contrib.files.exists(remote_key_path):
+        put(local_key_path, remote_key_path)
+    run('chmod 400 {}'.format(remote_key_path))
+
     kwargs = {'ssh_user': _ssh_user, 'hostname': hostname, 'key_path': remote_key_path, 'host_ip': _host_ip}
     fabric.contrib.files.append(remote_config_path, SSH_CONFIG_ENTRY.format(**kwargs))
 
     run('chmod 400 {}'.format(remote_config_path))
 
 
-def ssh_known_hosts(hostname):
-    run('ssh-keyscan {}'.format(hostname))
+ADD_KNOWN_HOST = '''if [ -z "`ssh-keygen -F {ip}`" ] ; then
+  ssh-keyscan -H {ip} >> {known_hosts_path}
+fi
+'''
+
+def ssh_known_hosts(hostname, known_hosts_path='~/.ssh/known_hosts'):
+    run('chmod 644 {}'.format(known_hosts_path))
+    run(ADD_KNOWN_HOST.format(ip='bitbucket.org', known_hosts_path=known_hosts_path))
+    run('chmod 400 {}'.format(known_hosts_path))
