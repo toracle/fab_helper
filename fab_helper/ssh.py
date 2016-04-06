@@ -2,9 +2,10 @@
 
 import os
 import fabric
-from fabric import run, put
+from fabric.api import run, put
 
 from fab_helper.util import match_and_delete_n_lines
+from fab_helper.path import get_user_homedir
 
 
 SSH_CONFIG_ENTRY = '''# Auto-generated entry for {hostname} of {ssh_user}
