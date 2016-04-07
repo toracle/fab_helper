@@ -11,7 +11,7 @@ except ImportError:
 
 setup(
     name='fab_helper',
-    version='0.0.3',
+    version='0.0.4',
     description=u'',
     author='Jeongsoo Park',
     author_email='toracle@gmail.com',
